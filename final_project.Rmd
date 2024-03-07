@@ -1,0 +1,22 @@
+```{r}
+
+y_m <- 5e4
+alphas <- c(0.5, 1.5, 2.5) #true values of alpha. You can try other values too.
+num_alphas <- length(alphas)
+ns <- c(15, 50, 100, 1000) # sample sizes. You can try other values too.
+num_ns <- length(ns)
+numIter <- 1000 # number of simulationsX
+B <- 1000 # number of bootstrap iterations per simulation
+# set up arrays to store the estimates from your simulation
+alpha_hat_MLE <- array(dim = c(num_alphas, num_ns, numIter))
+rmse_MLE <- array(dim = c(num_alphas, num_ns))
+# (use similar code for your other estimates, CI coverage, etc.)
+for(i in 1:num_alphas){ #i indexes the alpha value
+    for(j in 1:num_ns){ #j indexes the sample size
+        for(k in 1:numIter){ #k indexes the simulation number for a fixed n and alpha
+            X <- rexp(ns[j], rate = alphas[i])
+            Y <- y_m * exp(X) # Y ~ Pareto(y_m, alpha)
+        }
+    }
+}
+```
