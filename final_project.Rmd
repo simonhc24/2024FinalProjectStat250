@@ -9,6 +9,8 @@ numIter <- 1000 # number of simulationsX
 B <- 1000 # number of bootstrap iterations per simulation
 # set up arrays to store the estimates from your simulation
 alpha_hat_MLE <- array(dim = c(num_alphas, num_ns, numIter))
+alpha_hat_MOM <- array(dim = c(num_alphas, num_ns, numIter))
+
 rmse_MLE <- array(dim = c(num_alphas, num_ns))
 # (use similar code for your other estimates, CI coverage, etc.)
 for(i in 1:num_alphas){ #i indexes the alpha value
@@ -16,6 +18,13 @@ for(i in 1:num_alphas){ #i indexes the alpha value
         for(k in 1:numIter){ #k indexes the simulation number for a fixed n and alpha
             X <- rexp(ns[j], rate = alphas[i])
             Y <- y_m * exp(X) # Y ~ Pareto(y_m, alpha)
+
+            Ybar = sum(Y)/n
+            alpha_hat_MLE[i,j,k] <- 1/Ybar
+
+            alpha_hat_MOM[i,j,k] <- Ybar/(Ybar-y_m)
+
+            
         }
     }
 }
