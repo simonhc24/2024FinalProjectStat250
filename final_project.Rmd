@@ -11,20 +11,32 @@ B <- 1000 # number of bootstrap iterations per simulation
 alpha_hat_MLE <- array(dim = c(num_alphas, num_ns, numIter))
 alpha_hat_MOM <- array(dim = c(num_alphas, num_ns, numIter))
 
+exact.lower<- array(dim = c(num_alphas, num_ns, numIter))
+exact.upper <- array(dim = c(num_alphas, num_ns, numIter))
+
+
+CLT.lower<- array(dim = c(num_alphas, num_ns, numIter))
+CLT.upper <- array(dim = c(num_alphas, num_ns, numIter))
+
 rmse_MLE <- array(dim = c(num_alphas, num_ns))
 # (use similar code for your other estimates, CI coverage, etc.)
 for(i in 1:num_alphas){ #i indexes the alpha value
     for(j in 1:num_ns){ #j indexes the sample size
         for(k in 1:numIter){ #k indexes the simulation number for a fixed n and alpha
-            X <- rexp(ns[j], rate = alphas[i])
+            n<-ns[j]
+            X <- rexp(n, rate = alphas[i])
             Y <- y_m * exp(X) # Y ~ Pareto(y_m, alpha)
 
             Ybar = sum(Y)/n
-            alpha_hat_MLE[i,j,k] <- 1/Ybar
+            alpha_hat_MLE[i,j,k] <- 1/Ybar #MLE Formula
 
-            alpha_hat_MOM[i,j,k] <- Ybar/(Ybar-y_m)
+            alpha_hat_MOM[i,j,k] <- Ybar/(Ybar-y_m) #MOM Formula
 
-            
+            exact.lower[i, j, k] <- alpha_hat_MLE[i,j,k]*qgamma(0.025, n, n)
+            exact.upper[i, j, k] <- alpha_hat_MLE[i,j,k]*qgamma(0.975, n, n)
+
+            CLT.lower[i, j, k] <-alpha_hat_MLE[i,j,k]- qt(0.975, n-1)*sqrt(n)*(1/sd(Y))
+            CLT.upper[i, j, k] <-alpha_hat_MLE[i,j,k] qt(0.975, n-1)*sqrt(n)*(1/sd(Y))
         }
     }
 }
