@@ -1,3 +1,7 @@
+
+
+
+
 ```{r}
 y_m <- 5e4
 alphas <- c(0.5, 1.5, 2.5) #true values of alpha. You can try other values too.
@@ -27,7 +31,7 @@ for(i in 1:num_alphas){ #i indexes the alpha value
             Y <- y_m * exp(X) # Y ~ Pareto(y_m, alpha)
 
             Ybar = mean(Y)
-            alpha_hat_MLE[i,j,k] <- 1/Ybar #MLE Formula
+            alpha_hat_MLE[i,j,k] <- 1/mean(log(Y/y_m)) #MLE Formula
 
             alpha_hat_MOM[i,j,k] <- Ybar/(Ybar-y_m) #MOM Formula
 
@@ -41,13 +45,11 @@ for(i in 1:num_alphas){ #i indexes the alpha value
             for(b in 1:B){
                 bootY<-sample(Y, replace=TRUE)
                 bootmean<-mean(bootY)
-                bootMLE[b]<-1/bootmean
+                bootMLE[b]<-1/mean(log(bootY/y_m))
                 bootMOM[b]<-bootmean/(bootmean-y_m)
             }
         }
         print(cat("i:", i,"j:", j))
-        
-
     }   
 }
 print("hi")
