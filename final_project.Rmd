@@ -26,7 +26,7 @@ for(i in 1:num_alphas){ #i indexes the alpha value
             X <- rexp(n, rate = alphas[i])
             Y <- y_m * exp(X) # Y ~ Pareto(y_m, alpha)
 
-            Ybar = sum(Y)/n
+            Ybar = mean(Y)
             alpha_hat_MLE[i,j,k] <- 1/Ybar #MLE Formula
 
             alpha_hat_MOM[i,j,k] <- Ybar/(Ybar-y_m) #MOM Formula
@@ -36,7 +36,19 @@ for(i in 1:num_alphas){ #i indexes the alpha value
 
             CLT.lower[i, j, k] <-alpha_hat_MLE[i,j,k]- qt(0.975, n-1)*sqrt(n)*(1/sd(Y))
             CLT.upper[i, j, k] <-alpha_hat_MLE[i,j,k]+ qt(0.975, n-1)*sqrt(n)*(1/sd(Y))
+            bootMLE <- numeric(B)
+            bootMOM <- numeric(B)
+            for(b in 1:B){
+                bootY<-sample(Y, replace=TRUE)
+                bootmean<-mean(bootY)
+                bootMLE[b]<-1/bootmean
+                bootMOM[b]<-bootmean/(bootmean-y_m)
+            }
         }
-    }
+        print(cat("i:", i,"j:", j))
+        
+
+    }   
 }
+print("hi")
 ```
