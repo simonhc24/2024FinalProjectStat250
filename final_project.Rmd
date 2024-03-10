@@ -4,9 +4,9 @@
 
 ```{r}
 y_m <- 5e4
-alphas <- c(0.5) #true values of alpha. You can try other values too.
+alphas <- c(0.5, 1.5, 2.5) #true values of alpha. You can try other values too.
 num_alphas <- length(alphas)
-ns <- c(5, 10, 15, 20, 25, 50, 100, 200, 1000, 10000) # sample sizes. You can try other values too.
+ns <- c(15, 50, 100, 1000) # sample sizes. You can try other values too.
 num_ns <- length(ns)
 numIter <- 1000 # number of simulationsX
 B <- 1000 # number of bootstrap iterations per simulation
@@ -28,6 +28,14 @@ boot.lowerMOM<- array(dim = c(num_alphas, num_ns, numIter))
 boot.upperMOM <- array(dim = c(num_alphas, num_ns, numIter))
 
 rmse_MLE <- array(dim = c(num_alphas, num_ns))
+rmse_MOM <- array(dim = c(num_alphas, num_ns))
+
+CI_coverage_exact <- array(dim = c(num_alphas, num_ns))
+CI_coverage_CLT <- array(dim = c(num_alphas, num_ns))
+
+CI_coverage_bootMLE <- array(dim = c(num_alphas, num_ns))
+CI_coverage_bootMOM <- array(dim = c(num_alphas, num_ns))
+
 # (use similar code for your other estimates, CI coverage, etc.)
 for(i in 1:num_alphas){ #i indexes the alpha value
     for(j in 1:num_ns){ #j indexes the sample size
@@ -44,8 +52,8 @@ for(i in 1:num_alphas){ #i indexes the alpha value
             exact.lower[i, j, k] <- alpha_hat_MLE[i,j,k]*qgamma(0.025, n, n)
             exact.upper[i, j, k] <- alpha_hat_MLE[i,j,k]*qgamma(0.975, n, n)
 
-            CLT.lower[i, j, k] <-alpha_hat_MLE[i,j,k]- qt(0.975, n-1)*sqrt(n)*(1/sd(Y))
-            CLT.upper[i, j, k] <-alpha_hat_MLE[i,j,k]+ qt(0.975, n-1)*sqrt(n)*(1/sd(Y))
+            CLT.lower[i, j, k] <-alpha_hat_MLE[i,j,k]- (sd(log(Y))/(sqrt(n)*qt(0.975, n-1)))
+            CLT.upper[i, j, k] <-alpha_hat_MLE[i,j,k]+ (sd(log(Y))/(sqrt(n)*qt(0.975, n-1)))
             bootMLE <- numeric(B)
             bootMOM <- numeric(B)
             for(b in 1:B){
@@ -59,6 +67,17 @@ for(i in 1:num_alphas){ #i indexes the alpha value
             boot.lowerMOM[i, j, k] <-quantile(bootMOM, 0.025)
             boot.upperMOM[i, j, k] <-quantile(bootMOM, 0.975)
         }
+        rmse_MLE[i, j] <- sqrt(mean((alpha_hat_MLE[i, j, ] - alphas[i])**2))
+        rmse_MOM[i, j] <- sqrt(mean((alpha_hat_MOM[i, j, ] - alphas[i])**2))
+
+        CI_coverage_exact[i, j] <- mean((alphas[i]>= exact.lower[i, j, ]) & (alphas[i]<= exact.upper[i, j, ]))
+        CI_coverage_CLT[i, j] <- mean((alphas[i]>= CLT.lower[i, j, ]) & (alphas[i]<= CLT.upper[i, j, ]))
+
+        CI_coverage_bootMLE[i, j] <- mean((alphas[i]>= boot.lowerMLE[i, j, ]) & (alphas[i]<= boot.upperMLE[i, j, ]))
+        CI_coverage_bootMOM[i, j] <- mean((alphas[i]>= boot.lowerMOM[i, j, ]) & (alphas[i]<= boot.upperMOM[i, j, ]))
+
+        print(cat("Our variables are: alpha:", alphas[i], "and n:", ns[j], "\n rmse_MLE is ", rmse_MLE[i, j], "\n and rmse_MOM is", rmse_MOM[i, j], "\n and CI_coverage_exact is", CI_coverage_exact[i, j], "\n and CI_coverage_CLT is ", CI_coverage_CLT[i, j], "\n and CI_coverage_bootMLE is", CI_coverage_bootMLE[i, j], "\n and CI_coverage_bootMOM is", CI_coverage_bootMOM[i, j], ""))
+
         
     }   
 }
