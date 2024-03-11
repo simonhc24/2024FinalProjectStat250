@@ -1,0 +1,44 @@
+
+```{r}
+library(ggplot2)
+library(devtools)
+install_github("ulrichriegel/Pareto", build_vignettes = TRUE)
+y_m <- 5e4
+
+fires <- read.csv('https://people.carleton.edu/~apoppick/ClassData/CA_fires',header = TRUE)
+
+Y<-fires$GIS_ACRES
+
+n<-length(Y)
+
+
+B <- 1000 # number of bootstrap iterations per simulation
+# set up arrays to store the estimates from your simulation
+
+alpha_hat_MLE <- 1/mean(log(Y/y_m)) #MLE Formula
+
+exact.lower <- alpha_hat_MLE*qgamma(0.025, n, n)
+exact.upper <- alpha_hat_MLE*qgamma(0.975, n, n)
+
+
+cat("Thus our estimate of alpha is ", alpha_hat_MLE, "With a 95% confidence interval (", exact.lower,"," ,exact.upper,")" )
+
+#Using this to set up a pareto distribution
+
+X <- rexp(length(Y), rate = alpha_hat_MLE)
+expected_dist <- y_m * exp(X) # Y ~ Pareto(y_m, alpha)
+
+qqplot(Y, expected_dist)
+
+```
+
+Our goal is to then get the expected number of fires per year:
+
+
+```{r}
+expected_rate = 9
+
+upperval<-3e5
+
+cat("This gives us an estimated number of fires over 300,000 acres as between ", expected_rate*(y_m/upperval)**exact.upper, "and ", expected_rate*(y_m/upperval)**exact.lower, "fires per year")
+```
