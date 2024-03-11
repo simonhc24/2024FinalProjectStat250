@@ -25,10 +25,16 @@ cat("Thus our estimate of alpha is ", alpha_hat_MLE, "With a 95% confidence inte
 
 #Using this to set up a pareto distribution
 
-X <- rexp(length(Y), rate = alpha_hat_MLE)
+X <- rexp(100000, rate = alpha_hat_MLE)
 expected_dist <- y_m * exp(X) # Y ~ Pareto(y_m, alpha)
 
-qqplot(Y/1000, expected_dist/1000, xlab = "Wildfire Size (1000 acres)", ylab = "Expected Value at Quantile (1000 Acres)")
+
+repquantiles<-c(1/(46/(1:45)))
+
+repvalues<-quantile(expected_dist, repquantiles)
+
+
+qqplot(Y/1000, repvalues/1000, xlab = "Wildfire Size (1000 acres)", ylab = "Expected Value at Quantile (1000 Acres) ")
 
 ```
 
