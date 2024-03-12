@@ -46,6 +46,6 @@ Our goal is to then get the expected number of fires per year:
 expected_rate = 9
 #Upper Value of Interest
 upperval<-3e5
-#Output From Formula
+#Output From
 cat("This gives us an estimated number of fires over 300,000 acres as between ", expected_rate*(y_m/upperval)**exact.upper, "and ", expected_rate*(y_m/upperval)**exact.lower, "fires per year")
 ```
